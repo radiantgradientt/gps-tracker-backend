@@ -18,7 +18,7 @@
       let map, marker;
 
       async function fetchLocation() {
-        const res = await fetch("https://your-render-backend.onrender.com/location");
+        const res = await fetch("https://gps-tracker-backend.onrender.com/location");
         return await res.json(); // expected { lat: number, lng: number }
       }
 
