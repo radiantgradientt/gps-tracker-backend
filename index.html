@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Live GPS Tracker</title>
+    <meta charset="utf-8" />
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCpKDgr-QRCZLkVW8A0NR9EAxGaWdhySEY"></script>
+    <style>
+      html, body, #map {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <script>
+      let map, marker;
+
+      async function fetchLocation() {
+        const res = await fetch("https://your-render-backend.onrender.com/location");
+        return await res.json(); // expected { lat: number, lng: number }
+      }
+
+      async function initMap() {
+        const { lat, lng } = await fetchLocation();
+
+        map = new google.maps.Map(document.getElementById("map"), {
+          center: { lat, lng },
+          zoom: 15,
+        });
+
+        marker = new google.maps.Marker({
+          position: { lat, lng },
+          map: map,
+          title: "Current Location"
+        });
+
+        // Auto-update every 5 seconds
+        setInterval(async () => {
+          const { lat, lng } = await fetchLocation();
+          marker.setPosition({ lat, lng });
+          map.panTo({ lat, lng });
+        }, 5000);
+      }
+
+      initMap();
+    </script>
+  </body>
+</html>
