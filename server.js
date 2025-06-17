@@ -1,24 +1,44 @@
 const express = require("express");
 const cors = require("cors");
+
 const app = express();
+const PORT = process.env.PORT || 3000;
 
-app.use(cors());
-app.use(express.json());
+// Middleware
+app.use(cors());            // Allow cross-origin requests
+app.use(express.json());    // Parse incoming JSON bodies
 
-let latestLocation = { lat: 0.0, lng: 0.0 };
+// In-memory store for the latest GPS location
+let latestLocation = {
+  lat: 0.0,
+  lng: 0.0
+};
 
+// POST /update – receives new location from GPS device
 app.post("/update", (req, res) => {
   const { lat, lng } = req.body;
-  if (!lat || !lng) return res.status(400).send("Missing lat/lng");
-  latestLocation = { lat, lng };
-  res.send("Location updated");
+
+  // Validate data
+  if (!lat || !lng) {
+    return res.status(400).json({ error: "Missing lat or lng" });
+  }
+
+  // Save new location
+  latestLocation = {
+    lat: parseFloat(lat),
+    lng: parseFloat(lng)
+  };
+
+  console.log("📍 Updated location:", latestLocation);
+  res.status(200).send("Location updated");
 });
 
+// GET /location – returns the latest GPS coordinates
 app.get("/location", (req, res) => {
   res.json(latestLocation);
 });
 
-const PORT = process.env.PORT || 3000;
+// Start the server
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`✅ Server running at http://localhost:${PORT}`);
 });
